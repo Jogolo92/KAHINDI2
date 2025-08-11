@@ -712,35 +712,57 @@ void UpdateDashboard()
 {
     string prefix = "MACD_EA_Dashboard_";
     
-    //--- Update values
-    ObjectSetString(0, prefix + "Value_0", OBJPROP_TEXT, symbol);
-    ObjectSetString(0, prefix + "Value_1", OBJPROP_TEXT, IntegerToString(totalActiveTrades));
-    ObjectSetString(0, prefix + "Value_2", OBJPROP_TEXT, StringFormat("$%.2f", GetTotalProfit()));
-    ObjectSetString(0, prefix + "Value_3", OBJPROP_TEXT, StringFormat("$%.2f", dailyProfit));
+    //--- Update values with error checking
+    if(ObjectFind(0, prefix + "Value_0") >= 0)
+        ObjectSetString(0, prefix + "Value_0", OBJPROP_TEXT, symbol);
+        
+    if(ObjectFind(0, prefix + "Value_1") >= 0)
+        ObjectSetString(0, prefix + "Value_1", OBJPROP_TEXT, IntegerToString(totalActiveTrades));
+        
+    if(ObjectFind(0, prefix + "Value_2") >= 0)
+        ObjectSetString(0, prefix + "Value_2", OBJPROP_TEXT, StringFormat("$%.2f", GetTotalProfit()));
+        
+    if(ObjectFind(0, prefix + "Value_3") >= 0)
+        ObjectSetString(0, prefix + "Value_3", OBJPROP_TEXT, StringFormat("$%.2f", dailyProfit));
     
-    double spread = (SymbolInfoDouble(symbol, SYMBOL_ASK) - SymbolInfoDouble(symbol, SYMBOL_BID)) / point;
-    ObjectSetString(0, prefix + "Value_4", OBJPROP_TEXT, StringFormat("%.1f pips", spread));
-    
-    if(ArraySize(macdMain) > 0)
+    //--- Update spread
+    double ask = SymbolInfoDouble(symbol, SYMBOL_ASK);
+    double bid = SymbolInfoDouble(symbol, SYMBOL_BID);
+    if(ask > 0.0 && bid > 0.0 && point > 0.0)
     {
-        ObjectSetString(0, prefix + "Value_5", OBJPROP_TEXT, StringFormat("%.5f", macdMain[0]));
-        ObjectSetString(0, prefix + "Value_6", OBJPROP_TEXT, StringFormat("%.5f", macdSignal[0]));
+        double spread = (ask - bid) / point;
+        if(ObjectFind(0, prefix + "Value_4") >= 0)
+            ObjectSetString(0, prefix + "Value_4", OBJPROP_TEXT, StringFormat("%.1f pips", spread));
     }
     
+    //--- Update MACD values
+    if(ArraySize(macdMain) > 0 && ArraySize(macdSignal) > 0)
+    {
+        if(ObjectFind(0, prefix + "Value_5") >= 0)
+            ObjectSetString(0, prefix + "Value_5", OBJPROP_TEXT, StringFormat("%.5f", macdMain[0]));
+            
+        if(ObjectFind(0, prefix + "Value_6") >= 0)
+            ObjectSetString(0, prefix + "Value_6", OBJPROP_TEXT, StringFormat("%.5f", macdSignal[0]));
+    }
+    
+    //--- Update status
     string status = "Active";
     if(!CheckRiskManagement())
         status = "Risk Limit";
-    else if(MathAbs(dailyProfit) >= InpDailyLossLimit)
+    else if(InpDailyLossLimit > 0.0 && MathAbs(dailyProfit) >= InpDailyLossLimit)
         status = "Daily Limit";
     
-    ObjectSetString(0, prefix + "Value_7", OBJPROP_TEXT, status);
+    if(ObjectFind(0, prefix + "Value_7") >= 0)
+        ObjectSetString(0, prefix + "Value_7", OBJPROP_TEXT, status);
     
     //--- Color coding for profit
-    color profitColor = (GetTotalProfit() >= 0) ? clrLimeGreen : clrRed;
-    ObjectSetInteger(0, prefix + "Value_2", OBJPROP_COLOR, profitColor);
+    color profitColor = (GetTotalProfit() >= 0.0) ? clrLimeGreen : clrRed;
+    if(ObjectFind(0, prefix + "Value_2") >= 0)
+        ObjectSetInteger(0, prefix + "Value_2", OBJPROP_COLOR, profitColor);
     
-    color dailyColor = (dailyProfit >= 0) ? clrLimeGreen : clrRed;
-    ObjectSetInteger(0, prefix + "Value_3", OBJPROP_COLOR, dailyColor);
+    color dailyColor = (dailyProfit >= 0.0) ? clrLimeGreen : clrRed;
+    if(ObjectFind(0, prefix + "Value_3") >= 0)
+        ObjectSetInteger(0, prefix + "Value_3", OBJPROP_COLOR, dailyColor);
 }
 
 //+------------------------------------------------------------------+
