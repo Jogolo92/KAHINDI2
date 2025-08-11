@@ -7,6 +7,7 @@
 #property link      "https://www.mql5.com"
 #property version   "1.00"
 #property description "MACD-based Expert Advisor with Hedging Logic"
+#property strict
 
 //--- Include necessary libraries
 #include <Trade\Trade.mqh>
