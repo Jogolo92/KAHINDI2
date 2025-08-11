@@ -355,6 +355,8 @@ bool OpenTrade(ENUM_ORDER_TYPE orderType, double lot, int level)
 //+------------------------------------------------------------------+
 void CheckHedgingOpportunities()
 {
+    if(point <= 0.0) return;
+    
     for(int i = 0; i < totalActiveTrades; i++)
     {
         if(!PositionSelectByTicket(activeTrades[i].ticket))
@@ -362,22 +364,29 @@ void CheckHedgingOpportunities()
         
         double currentPrice = positionInfo.PriceCurrent();
         double openPrice = activeTrades[i].openPrice;
-        double pipsDiff = 0;
+        double pipsDiff = 0.0;
+        
+        if(currentPrice <= 0.0 || openPrice <= 0.0)
+            continue;
         
         if(activeTrades[i].type == POSITION_TYPE_BUY)
         {
             pipsDiff = (openPrice - currentPrice) / point;
         }
-        else
+        else if(activeTrades[i].type == POSITION_TYPE_SELL)
         {
             pipsDiff = (currentPrice - openPrice) / point;
         }
+        else
+        {
+            continue; // Invalid position type
+        }
         
         //--- Check if hedge is needed
-        if(pipsDiff >= InpPipOffset && activeTrades[i].level < InpMaxHedgedTrades)
+        if(pipsDiff >= (double)InpPipOffset && activeTrades[i].level < InpMaxHedgedTrades)
         {
             //--- Calculate hedge lot size
-            double hedgeLot = activeTrades[i].lot * MathPow(InpLotMultiplier, activeTrades[i].level + 1);
+            double hedgeLot = activeTrades[i].lot * MathPow(InpLotMultiplier, (double)(activeTrades[i].level + 1));
             
             //--- Open hedge trade
             ENUM_ORDER_TYPE hedgeType = (activeTrades[i].type == POSITION_TYPE_BUY) ? ORDER_TYPE_SELL : ORDER_TYPE_BUY;
