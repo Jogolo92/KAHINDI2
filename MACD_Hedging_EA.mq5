@@ -446,19 +446,24 @@ double GetTotalProfit()
 //+------------------------------------------------------------------+
 void CloseAllTrades()
 {
-    for(int i = PositionsTotal() - 1; i >= 0; i--)
+    int totalPositions = PositionsTotal();
+    for(int i = totalPositions - 1; i >= 0; i--)
     {
         if(positionInfo.SelectByIndex(i))
         {
             if(positionInfo.Symbol() == symbol && positionInfo.Magic() == 12345)
             {
-                trade.PositionClose(positionInfo.Ticket());
+                if(!trade.PositionClose(positionInfo.Ticket()))
+                {
+                    Print("Failed to close position: ", trade.ResultRetcodeDescription());
+                }
             }
         }
     }
     
     //--- Clear active trades list
     totalActiveTrades = 0;
+    ArrayInitialize(activeTrades, {0, 0, 0.0, 0.0, POSITION_TYPE_BUY, 0});
 }
 
 //+------------------------------------------------------------------+
