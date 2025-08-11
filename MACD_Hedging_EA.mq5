@@ -287,37 +287,64 @@ void CheckEntrySignals()
 //+------------------------------------------------------------------+
 bool OpenTrade(ENUM_ORDER_TYPE orderType, double lot, int level)
 {
-    double price = 0;
-    double sl = 0, tp = 0;
+    double price = 0.0;
+    double sl = 0.0;
+    double tp = 0.0;
     
     if(orderType == ORDER_TYPE_BUY)
         price = SymbolInfoDouble(symbol, SYMBOL_ASK);
     else if(orderType == ORDER_TYPE_SELL)
         price = SymbolInfoDouble(symbol, SYMBOL_BID);
+    else
+    {
+        Print("Error: Invalid order type");
+        return false;
+    }
+    
+    if(price <= 0.0)
+    {
+        Print("Error: Invalid price for order");
+        return false;
+    }
     
     //--- Validate lot size
     lot = NormalizeLot(lot);
+    if(lot <= 0.0)
+    {
+        Print("Error: Invalid lot size after normalization");
+        return false;
+    }
     
     bool result = false;
+    string comment = StringFormat("MACD_EA_Level_%d", level);
+    
     if(orderType == ORDER_TYPE_BUY)
-        result = trade.Buy(lot, symbol, price, sl, tp, StringFormat("MACD_EA_Level_%d", level));
-    else
-        result = trade.Sell(lot, symbol, price, sl, tp, StringFormat("MACD_EA_Level_%d", level));
+        result = trade.Buy(lot, symbol, price, sl, tp, comment);
+    else if(orderType == ORDER_TYPE_SELL)
+        result = trade.Sell(lot, symbol, price, sl, tp, comment);
     
     if(result)
     {
         ulong ticket = trade.ResultOrder();
-        AddTradeToList(ticket, level, lot, price, (ENUM_POSITION_TYPE)orderType);
-        
-        string msg = StringFormat("Trade opened: %s %.2f lots at %.5f (Level %d)", 
-                                  orderType == ORDER_TYPE_BUY ? "BUY" : "SELL", 
-                                  lot, price, level);
-        SendAlert(msg, "Trade Opened");
-        Print(msg);
+        if(ticket > 0)
+        {
+            AddTradeToList(ticket, level, lot, price, (ENUM_POSITION_TYPE)orderType);
+            
+            string msg = StringFormat("Trade opened: %s %.2f lots at %.*f (Level %d)", 
+                                      orderType == ORDER_TYPE_BUY ? "BUY" : "SELL", 
+                                      lot, digits, price, level);
+            SendAlert(msg, "Trade Opened");
+            Print(msg);
+        }
+        else
+        {
+            Print("Error: Invalid ticket returned");
+            return false;
+        }
     }
     else
     {
-        Print("Failed to open trade: ", trade.ResultRetcodeDescription());
+        Print("Failed to open trade: ", trade.ResultRetcodeDescription(), " Code: ", trade.ResultRetcode());
     }
     
     return result;
