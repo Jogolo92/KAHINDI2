@@ -473,35 +473,34 @@ void UpdateActiveTrades()
 {
     totalActiveTrades = 0;
     
-    for(int i = 0; i < PositionsTotal(); i++)
+    int totalPositions = PositionsTotal();
+    for(int i = 0; i < totalPositions && totalActiveTrades < 100; i++)
     {
         if(positionInfo.SelectByIndex(i))
         {
             if(positionInfo.Symbol() == symbol && positionInfo.Magic() == 12345)
             {
-                if(totalActiveTrades < 100)
+                activeTrades[totalActiveTrades].ticket = positionInfo.Ticket();
+                activeTrades[totalActiveTrades].type = positionInfo.PositionType();
+                activeTrades[totalActiveTrades].lot = positionInfo.Volume();
+                activeTrades[totalActiveTrades].openPrice = positionInfo.PriceOpen();
+                activeTrades[totalActiveTrades].openTime = positionInfo.Time();
+                
+                //--- Extract level from comment
+                string comment = positionInfo.Comment();
+                string search = "Level_";
+                int pos = StringFind(comment, search);
+                if(pos >= 0)
                 {
-                    activeTrades[totalActiveTrades].ticket = positionInfo.Ticket();
-                    activeTrades[totalActiveTrades].type = positionInfo.PositionType();
-                    activeTrades[totalActiveTrades].lot = positionInfo.Volume();
-                    activeTrades[totalActiveTrades].openPrice = positionInfo.PriceOpen();
-                    activeTrades[totalActiveTrades].openTime = positionInfo.Time();
-                    
-                    //--- Extract level from comment
-                    string comment = positionInfo.Comment();
-                    string search = "Level_";
-                    int pos = StringFind(comment, search);
-                    if(pos >= 0)
-                    {
-                        activeTrades[totalActiveTrades].level = (int)StringToInteger(StringSubstr(comment, pos + StringLen(search)));
-                    }
-                    else
-                    {
-                        activeTrades[totalActiveTrades].level = 0;
-                    }
-                    
-                    totalActiveTrades++;
+                    string levelStr = StringSubstr(comment, pos + StringLen(search));
+                    activeTrades[totalActiveTrades].level = (int)StringToInteger(levelStr);
                 }
+                else
+                {
+                    activeTrades[totalActiveTrades].level = 0;
+                }
+                
+                totalActiveTrades++;
             }
         }
     }
