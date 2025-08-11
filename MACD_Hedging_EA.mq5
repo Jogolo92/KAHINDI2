@@ -637,51 +637,71 @@ void CreateDashboard()
 {
     string prefix = "MACD_EA_Dashboard_";
     
+    //--- Clear any existing objects first
+    RemoveDashboard();
+    
     //--- Background panel
-    ObjectCreate(0, prefix + "Background", OBJ_RECTANGLE_LABEL, 0, 0, 0);
-    ObjectSetInteger(0, prefix + "Background", OBJPROP_XDISTANCE, InpDashboardX);
-    ObjectSetInteger(0, prefix + "Background", OBJPROP_YDISTANCE, InpDashboardY);
-    ObjectSetInteger(0, prefix + "Background", OBJPROP_XSIZE, 300);
-    ObjectSetInteger(0, prefix + "Background", OBJPROP_YSIZE, 200);
-    ObjectSetInteger(0, prefix + "Background", OBJPROP_BGCOLOR, clrDarkSlateGray);
-    ObjectSetInteger(0, prefix + "Background", OBJPROP_BORDER_TYPE, BORDER_FLAT);
-    ObjectSetInteger(0, prefix + "Background", OBJPROP_STATE, false);
-    ObjectSetInteger(0, prefix + "Background", OBJPROP_HIDDEN, true);
-    ObjectSetInteger(0, prefix + "Background", OBJPROP_FONTSIZE, 8);
-    dashboardObjects[totalDashboardObjects++] = prefix + "Background";
+    if(ObjectCreate(0, prefix + "Background", OBJ_RECTANGLE_LABEL, 0, 0, 0))
+    {
+        ObjectSetInteger(0, prefix + "Background", OBJPROP_XDISTANCE, InpDashboardX);
+        ObjectSetInteger(0, prefix + "Background", OBJPROP_YDISTANCE, InpDashboardY);
+        ObjectSetInteger(0, prefix + "Background", OBJPROP_XSIZE, 300);
+        ObjectSetInteger(0, prefix + "Background", OBJPROP_YSIZE, 200);
+        ObjectSetInteger(0, prefix + "Background", OBJPROP_BGCOLOR, clrDarkSlateGray);
+        ObjectSetInteger(0, prefix + "Background", OBJPROP_BORDER_TYPE, BORDER_FLAT);
+        ObjectSetInteger(0, prefix + "Background", OBJPROP_STATE, false);
+        ObjectSetInteger(0, prefix + "Background", OBJPROP_HIDDEN, true);
+        ObjectSetInteger(0, prefix + "Background", OBJPROP_FONTSIZE, 8);
+        
+        if(totalDashboardObjects < ArraySize(dashboardObjects))
+            dashboardObjects[totalDashboardObjects++] = prefix + "Background";
+    }
     
     //--- Title
-    ObjectCreate(0, prefix + "Title", OBJ_LABEL, 0, 0, 0);
-    ObjectSetInteger(0, prefix + "Title", OBJPROP_XDISTANCE, InpDashboardX + 10);
-    ObjectSetInteger(0, prefix + "Title", OBJPROP_YDISTANCE, InpDashboardY + 10);
-    ObjectSetInteger(0, prefix + "Title", OBJPROP_COLOR, clrWhite);
-    ObjectSetInteger(0, prefix + "Title", OBJPROP_FONTSIZE, 12);
-    ObjectSetString(0, prefix + "Title", OBJPROP_FONT, "Arial Bold");
-    ObjectSetString(0, prefix + "Title", OBJPROP_TEXT, "MACD Hedging EA Dashboard");
-    dashboardObjects[totalDashboardObjects++] = prefix + "Title";
+    if(ObjectCreate(0, prefix + "Title", OBJ_LABEL, 0, 0, 0))
+    {
+        ObjectSetInteger(0, prefix + "Title", OBJPROP_XDISTANCE, InpDashboardX + 10);
+        ObjectSetInteger(0, prefix + "Title", OBJPROP_YDISTANCE, InpDashboardY + 10);
+        ObjectSetInteger(0, prefix + "Title", OBJPROP_COLOR, clrWhite);
+        ObjectSetInteger(0, prefix + "Title", OBJPROP_FONTSIZE, 12);
+        ObjectSetString(0, prefix + "Title", OBJPROP_FONT, "Arial Bold");
+        ObjectSetString(0, prefix + "Title", OBJPROP_TEXT, "MACD Hedging EA Dashboard");
+        
+        if(totalDashboardObjects < ArraySize(dashboardObjects))
+            dashboardObjects[totalDashboardObjects++] = prefix + "Title";
+    }
     
     //--- Create labels for data
     string labels[] = {"Symbol:", "Active Trades:", "Total Profit:", "Daily Profit:", "Spread:", "MACD Main:", "MACD Signal:", "Status:"};
+    int labelCount = ArraySize(labels);
     
-    for(int i = 0; i < ArraySize(labels); i++)
+    for(int i = 0; i < labelCount; i++)
     {
         string labelName = prefix + "Label_" + IntegerToString(i);
-        ObjectCreate(0, labelName, OBJ_LABEL, 0, 0, 0);
-        ObjectSetInteger(0, labelName, OBJPROP_XDISTANCE, InpDashboardX + 10);
-        ObjectSetInteger(0, labelName, OBJPROP_YDISTANCE, InpDashboardY + 35 + (i * 18));
-        ObjectSetInteger(0, labelName, OBJPROP_COLOR, clrLightGray);
-        ObjectSetInteger(0, labelName, OBJPROP_FONTSIZE, 9);
-        ObjectSetString(0, labelName, OBJPROP_TEXT, labels[i]);
-        dashboardObjects[totalDashboardObjects++] = labelName;
+        if(ObjectCreate(0, labelName, OBJ_LABEL, 0, 0, 0))
+        {
+            ObjectSetInteger(0, labelName, OBJPROP_XDISTANCE, InpDashboardX + 10);
+            ObjectSetInteger(0, labelName, OBJPROP_YDISTANCE, InpDashboardY + 35 + (i * 18));
+            ObjectSetInteger(0, labelName, OBJPROP_COLOR, clrLightGray);
+            ObjectSetInteger(0, labelName, OBJPROP_FONTSIZE, 9);
+            ObjectSetString(0, labelName, OBJPROP_TEXT, labels[i]);
+            
+            if(totalDashboardObjects < ArraySize(dashboardObjects))
+                dashboardObjects[totalDashboardObjects++] = labelName;
+        }
         
         string valueName = prefix + "Value_" + IntegerToString(i);
-        ObjectCreate(0, valueName, OBJ_LABEL, 0, 0, 0);
-        ObjectSetInteger(0, valueName, OBJPROP_XDISTANCE, InpDashboardX + 120);
-        ObjectSetInteger(0, valueName, OBJPROP_YDISTANCE, InpDashboardY + 35 + (i * 18));
-        ObjectSetInteger(0, valueName, OBJPROP_COLOR, clrWhite);
-        ObjectSetInteger(0, valueName, OBJPROP_FONTSIZE, 9);
-        ObjectSetString(0, valueName, OBJPROP_TEXT, "---");
-        dashboardObjects[totalDashboardObjects++] = valueName;
+        if(ObjectCreate(0, valueName, OBJ_LABEL, 0, 0, 0))
+        {
+            ObjectSetInteger(0, valueName, OBJPROP_XDISTANCE, InpDashboardX + 120);
+            ObjectSetInteger(0, valueName, OBJPROP_YDISTANCE, InpDashboardY + 35 + (i * 18));
+            ObjectSetInteger(0, valueName, OBJPROP_COLOR, clrWhite);
+            ObjectSetInteger(0, valueName, OBJPROP_FONTSIZE, 9);
+            ObjectSetString(0, valueName, OBJPROP_TEXT, "---");
+            
+            if(totalDashboardObjects < ArraySize(dashboardObjects))
+                dashboardObjects[totalDashboardObjects++] = valueName;
+        }
     }
 }
 
