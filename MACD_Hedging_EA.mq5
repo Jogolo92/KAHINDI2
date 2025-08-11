@@ -550,7 +550,7 @@ bool HasOpenPositions()
 bool CheckRiskManagement()
 {
     //--- Check daily loss limit
-    if(InpDailyLossLimit > 0 && MathAbs(dailyProfit) >= InpDailyLossLimit)
+    if(InpDailyLossLimit > 0.0 && MathAbs(dailyProfit) >= InpDailyLossLimit)
     {
         static bool dailyLimitWarned = false;
         if(!dailyLimitWarned)
@@ -562,14 +562,20 @@ bool CheckRiskManagement()
     }
     
     //--- Check spread
-    double spread = (SymbolInfoDouble(symbol, SYMBOL_ASK) - SymbolInfoDouble(symbol, SYMBOL_BID)) / point;
+    double ask = SymbolInfoDouble(symbol, SYMBOL_ASK);
+    double bid = SymbolInfoDouble(symbol, SYMBOL_BID);
+    if(ask <= 0.0 || bid <= 0.0 || point <= 0.0)
+        return false;
+        
+    double spread = (ask - bid) / point;
     if(spread > InpMaxSpread)
         return false;
     
     //--- Check trading time window
     datetime currentTime = TimeCurrent();
     MqlDateTime dt;
-    TimeToStruct(currentTime, dt);
+    if(!TimeToStruct(currentTime, dt))
+        return false;
     
     if(InpTradingStartHour <= InpTradingEndHour)
     {
