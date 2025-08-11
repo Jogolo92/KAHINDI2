@@ -532,7 +532,8 @@ void AddTradeToList(ulong ticket, int level, double lot, double price, ENUM_POSI
 //+------------------------------------------------------------------+
 bool HasOpenPositions()
 {
-    for(int i = 0; i < PositionsTotal(); i++)
+    int totalPositions = PositionsTotal();
+    for(int i = 0; i < totalPositions; i++)
     {
         if(positionInfo.SelectByIndex(i))
         {
