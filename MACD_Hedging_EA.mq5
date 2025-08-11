@@ -511,7 +511,7 @@ void UpdateActiveTrades()
 //+------------------------------------------------------------------+
 void AddTradeToList(ulong ticket, int level, double lot, double price, ENUM_POSITION_TYPE type)
 {
-    if(totalActiveTrades < 100)
+    if(totalActiveTrades < 100 && ticket > 0)
     {
         activeTrades[totalActiveTrades].ticket = ticket;
         activeTrades[totalActiveTrades].level = level;
@@ -520,6 +520,10 @@ void AddTradeToList(ulong ticket, int level, double lot, double price, ENUM_POSI
         activeTrades[totalActiveTrades].type = type;
         activeTrades[totalActiveTrades].openTime = TimeCurrent();
         totalActiveTrades++;
+    }
+    else
+    {
+        Print("Warning: Cannot add trade to list - array full or invalid ticket");
     }
 }
 
