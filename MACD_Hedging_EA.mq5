@@ -224,10 +224,22 @@ void OnTick()
 //+------------------------------------------------------------------+
 bool GetMACDValues()
 {
-    if(CopyBuffer(macdHandle, 0, 0, 3, macdMain) <= 0)
+    ArrayInitialize(macdMain, 0.0);
+    ArrayInitialize(macdSignal, 0.0);
+    
+    int copied1 = CopyBuffer(macdHandle, 0, 0, 3, macdMain);
+    if(copied1 <= 0)
+    {
+        Print("Error copying MACD main buffer: ", GetLastError());
         return false;
-    if(CopyBuffer(macdHandle, 1, 0, 3, macdSignal) <= 0)
+    }
+    
+    int copied2 = CopyBuffer(macdHandle, 1, 0, 3, macdSignal);
+    if(copied2 <= 0)
+    {
+        Print("Error copying MACD signal buffer: ", GetLastError());
         return false;
+    }
     
     return true;
 }
