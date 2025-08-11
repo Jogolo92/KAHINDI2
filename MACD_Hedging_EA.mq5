@@ -598,8 +598,9 @@ void CheckDailyReset()
 {
     datetime currentTime = TimeCurrent();
     MqlDateTime lastDt, currentDt;
-    TimeToStruct(lastDayReset, lastDt);
-    TimeToStruct(currentTime, currentDt);
+    
+    if(!TimeToStruct(lastDayReset, lastDt) || !TimeToStruct(currentTime, currentDt))
+        return;
     
     if(currentDt.day != lastDt.day || currentDt.mon != lastDt.mon || currentDt.year != lastDt.year)
     {
