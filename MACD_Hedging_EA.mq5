@@ -50,14 +50,16 @@ CTrade trade;
 CPositionInfo positionInfo;
 COrderInfo orderInfo;
 
-int macdHandle;
+int macdHandle = INVALID_HANDLE;
 double macdMain[], macdSignal[];
-string symbol;
-double point, tickSize, tickValue;
-int digits;
+string symbol = "";
+double point = 0.0;
+double tickSize = 0.0; 
+double tickValue = 0.0;
+int digits = 0;
 
 //--- Dashboard objects
-string dashboardObjects[20];
+string dashboardObjects[50];
 int totalDashboardObjects = 0;
 
 //--- Trading variables
@@ -74,7 +76,7 @@ struct TradeInfo
 TradeInfo activeTrades[100];
 int totalActiveTrades = 0;
 double dailyProfit = 0.0;
-datetime lastDayReset;
+datetime lastDayReset = 0;
 bool newBarFlag = false;
 
 //+------------------------------------------------------------------+
