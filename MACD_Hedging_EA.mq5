@@ -91,6 +91,25 @@ int OnInit()
     tickValue = SymbolInfoDouble(symbol, SYMBOL_TRADE_TICK_VALUE);
     digits = (int)SymbolInfoInteger(symbol, SYMBOL_DIGITS);
     
+    //--- Validate inputs
+    if(InpInitialLot <= 0.0)
+    {
+        Print("Error: Initial lot size must be positive");
+        return INIT_PARAMETERS_INCORRECT;
+    }
+    
+    if(InpMaxHedgedTrades <= 0)
+    {
+        Print("Error: Maximum hedged trades must be positive");
+        return INIT_PARAMETERS_INCORRECT;
+    }
+    
+    if(InpPipOffset <= 0)
+    {
+        Print("Error: Pip offset must be positive");
+        return INIT_PARAMETERS_INCORRECT;
+    }
+    
     //--- Initialize MACD indicator
     macdHandle = iMACD(symbol, InpTimeframe, InpMACDFastEMA, InpMACDSlowEMA, InpMACDSignalSMA, InpMACDPrice);
     if(macdHandle == INVALID_HANDLE)
@@ -102,14 +121,24 @@ int OnInit()
     //--- Initialize arrays
     ArraySetAsSeries(macdMain, true);
     ArraySetAsSeries(macdSignal, true);
+    ArrayResize(macdMain, 10);
+    ArrayResize(macdSignal, 10);
+    ArrayInitialize(macdMain, 0.0);
+    ArrayInitialize(macdSignal, 0.0);
     
     //--- Initialize trading
     trade.SetExpertMagicNumber(12345);
     trade.SetMarginMode();
-    trade.SetTypeFillingBySymbol(symbol);
+    if(!trade.SetTypeFillingBySymbol(symbol))
+    {
+        Print("Warning: Could not set filling type for symbol ", symbol);
+    }
     
     //--- Initialize daily tracking
     lastDayReset = TimeCurrent();
+    
+    //--- Initialize active trades array
+    ArrayInitialize(activeTrades, {0, 0, 0.0, 0.0, POSITION_TYPE_BUY, 0});
     
     //--- Create dashboard if enabled
     if(InpShowDashboard)
