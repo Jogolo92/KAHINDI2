@@ -249,25 +249,35 @@ bool GetMACDValues()
 //+------------------------------------------------------------------+
 void CheckEntrySignals()
 {
+    //--- Check array size
+    if(ArraySize(macdMain) < 2 || ArraySize(macdSignal) < 2)
+        return;
+        
     //--- Avoid multiple trades in same direction
     if(HasOpenPositions())
         return;
     
     //--- Buy signal: MACD main > 0 AND MACD signal < MACD main
-    if(macdMain[0] > 0 && macdSignal[0] < macdMain[0])
+    if(macdMain[0] > 0.0 && macdSignal[0] < macdMain[0])
     {
         if(macdSignal[1] >= macdMain[1]) // Signal crossing
         {
-            OpenTrade(ORDER_TYPE_BUY, InpInitialLot, 0);
+            if(!OpenTrade(ORDER_TYPE_BUY, InpInitialLot, 0))
+            {
+                Print("Failed to open BUY trade");
+            }
         }
     }
     
     //--- Sell signal: MACD main < 0 AND MACD signal > MACD main
-    if(macdMain[0] < 0 && macdSignal[0] > macdMain[0])
+    if(macdMain[0] < 0.0 && macdSignal[0] > macdMain[0])
     {
         if(macdSignal[1] <= macdMain[1]) // Signal crossing
         {
-            OpenTrade(ORDER_TYPE_SELL, InpInitialLot, 0);
+            if(!OpenTrade(ORDER_TYPE_SELL, InpInitialLot, 0))
+            {
+                Print("Failed to open SELL trade");
+            }
         }
     }
 }
